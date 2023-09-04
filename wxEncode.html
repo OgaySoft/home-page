@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本转微信表情编码</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: antiquewhite;
+        }
+
+        .container {
+            width: 95%;
+            margin: 0 auto;
+        }
+
+        .pageTitle {
+            text-align: center;
+            padding: 25px 0;
+            font-size: 24px;
+        }
+
+        .inputBox {
+            display: block;
+            margin: 0 auto;
+            resize: none;
+            font-size: 16px;
+            width: 90%;
+            height: 200px;
+        }
+
+        .toolBar {
+            margin: 15px auto;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 2px;
+            margin: 0 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="pageTitle">文本转微信表情编码</div>
+        <div class="inputDiv">
+            <textarea class="inputBox" id="encode-text" placeholder="请输入需要编码的内容"></textarea>
+        </div>
+        <div class="toolBar">
+            <input type="button" class="btn" onclick="copyText()" value="&nbsp;复制内容&nbsp;">
+            <input type="button" class="btn" onclick="copyEmoji()" value="&nbsp;复制表情&nbsp;">
+        </div>
+        <div class="inputDiv">
+            <textarea class="inputBox" id="decode-text" placeholder="请输入需要解码的内容"></textarea>
+        </div>
+    </div>
+
+
+
+    <script>
+        let base = new BASE64();
+
+
+        let encodeChange = document.getElementById("encode-text")
+        encodeChange.oninput = function () {
+            // 编码
+            let result = base.encode(document.getElementById("encode-text").value);
+            document.getElementById("decode-text").value = result
+        }
+
+
+        let decodeChange = document.getElementById("decode-text")
+        decodeChange.oninput = function () {
+            // 解码
+            let result = base.decode(document.getElementById("decode-text").value);
+            document.getElementById("encode-text").value = result
+        }
+
+
+        let copyText = () => {
+            var copyText = document.getElementById("encode-text");
+            copyText.select();
+            document.execCommand("copy");
+        }
+
+
+        let copyEmoji = () => {
+            var copyText = document.getElementById("decode-text");
+            copyText.select();
+            document.execCommand("copy");
+        }
+
+
+
+        function BASE64() {
+
+            emojiTable = ['[微笑]', '[撇嘴]', '[好的]', '[发呆]', '[得意]', '[流泪]', '[害羞]', '[闭嘴]', '[打脸]', '[大哭]',
+                '[尴尬]', '[发怒]', '[调皮]', '[呲牙]', '[惊讶]', '[难过]', '[叹气]', '[抓狂]', '[苦涩]', '[偷笑]', '[愉快]',
+                '[白眼]', '[傲慢]', '[裂开]', '[惊恐]', '[憨笑]', '[悠闲]', '[咒骂]', '[疑问]', '[嘴唇]', '[爱心]', '[心碎]',
+                '[骷髅]', '[敲打]', '[再见]', '[擦汗]', '[抠鼻]', '[鼓掌]', '[坏笑]', '[拥抱]', '[鄙视]', '[委屈]', '[握手]',
+                '[阴险]', '[亲亲]', '[可怜]', '[笑脸]', '[生病]', '[脸红]', '[胜利]', '[恐惧]', '[失望]', '[无语]', '[嘿哈]',
+                '[捂脸]', '[奸笑]', '[机智]', '[皱眉]', '[抱拳]', '[吃瓜]', '[加油]', '[勾引]', '[天啊]', '[便便]', '[旺柴]'];
+
+            this.encode = (input) => {
+                var output = "";
+                var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+                var i = 0;
+                input = _utf8_encode(input);
+                while (i < input.length) {
+                    chr1 = input.charCodeAt(i++);
+                    chr2 = input.charCodeAt(i++);
+                    chr3 = input.charCodeAt(i++);
+                    enc1 = chr1 >> 2;
+                    enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+                    enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+                    enc4 = chr3 & 63;
+                    if (isNaN(chr2)) {
+                        enc3 = enc4 = 64;
+                    } else if (isNaN(chr3)) {
+                        enc4 = 64;
+                    }
+                    output = output +
+                        emojiTable[enc1] + emojiTable[enc2] +
+                        emojiTable[enc3] + emojiTable[enc4];
+                }
+                return output;
+            }
+
+            this.decode = (input) => {
+                var output = "";
+                var chr1, chr2, chr3;
+                var enc1, enc2, enc3, enc4;
+                var i = 0;
+                while (i < input.length) {
+                    enc1 = emojiTable.indexOf(input.substring(i, i += 4));
+                    enc2 = emojiTable.indexOf(input.substring(i, i += 4));
+                    enc3 = emojiTable.indexOf(input.substring(i, i += 4));
+                    enc4 = emojiTable.indexOf(input.substring(i, i += 4));
+                    chr1 = (enc1 << 2) | (enc2 >> 4);
+                    chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                    chr3 = ((enc3 & 3) << 6) | enc4;
+                    output = output + String.fromCharCode(chr1);
+                    if (enc3 != 64) {
+                        output = output + String.fromCharCode(chr2);
+                    }
+                    if (enc4 != 64) {
+                        output = output + String.fromCharCode(chr3);
+                    }
+                }
+
+                output = _utf8_decode(output);
+                return output;
+            }
+
+            _utf8_encode = (string) => {
+                string = string.replace(/\r\n/g, "\n");
+                var utftext = "";
+                for (var n = 0; n < string.length; n++) {
+                    var c = string.charCodeAt(n);
+                    if (c < 128) {
+                        utftext += String.fromCharCode(c);
+                    } else if ((c > 127) && (c < 2048)) {
+                        utftext += String.fromCharCode((c >> 6) | 192);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    } else {
+                        utftext += String.fromCharCode((c >> 12) | 224);
+                        utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                        utftext += String.fromCharCode((c & 63) | 128);
+                    }
+
+                }
+                return utftext;
+            }
+
+            _utf8_decode = (utftext) => {
+                var string = "";
+                var i = 0;
+                var c = c1 = c2 = 0;
+                while (i < utftext.length) {
+                    c = utftext.charCodeAt(i);
+                    if (c < 128) {
+                        string += String.fromCharCode(c);
+                        i++;
+                    } else if ((c > 191) && (c < 224)) {
+                        c2 = utftext.charCodeAt(i + 1);
+                        string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                        i += 2;
+                    } else {
+                        c2 = utftext.charCodeAt(i + 1);
+                        c3 = utftext.charCodeAt(i + 2);
+                        string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                        i += 3;
+                    }
+                }
+                return string;
+            }
+        }
+    </script>
+</body>
+
+</html>
