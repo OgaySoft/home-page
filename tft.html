@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>选项抽取器</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }button {
+  padding: 15px 30px;
+  background-color: #4da6ff;
+  color: #fff;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+  background-color: #3399ff;
+}
+
+.result {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.result-item {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+  </style>
+</head>
+<body>
+  <button onclick="drawOptions()">抽取选项</button>
+  <div class="result" id="result"></div>  <script>
+    const options = [
+      '源计划', '杀手', '强袭射手', '街头恶魔', '高级工程师', '迅捷射手', '福牛守护者',
+      '辛迪加', '重装战士', '堡垒卫士', '幻灵战队', '人造人', '超频战士',
+      '圣灵使者', '执事', '战略分析师', '斗士', '战地机甲', '赛博牢大'
+    ];
+
+    function drawOptions() {
+      const shuffled = options.sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 3);
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+      selected.forEach(option => {
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        div.textContent = option;
+        resultDiv.appendChild(div);
+      });
+    }
+  </script></body>
+</html>
