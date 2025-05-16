@@ -20,8 +20,9 @@
   background-color: #4da6ff;
   color: #fff;
   font-size: 18px;
+  font-weight: 600;
   border: none;
-  border-radius: 10px;
+  border-radius: 16px; /* g2/g3 等效圆角 */
   cursor: pointer;
   transition: background-color 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -42,18 +43,46 @@ button:hover {
   margin: 10px 0;
 }
 
+.message {
+  margin-top: 20px;
+  color: red;
+  font-size: 16px;
+}
+
   </style>
 </head>
 <body>
   <button onclick="drawOptions()">抽取选项</button>
-  <div class="result" id="result"></div>  <script>
+  <div class="result" id="result"></div>
+  <div class="message" id="message"></div>  <script>
     const options = [
       '源计划', '杀手', '强袭射手', '街头恶魔', '高级工程师', '迅捷射手', '福牛守护者',
       '辛迪加', '重装战士', '堡垒卫士', '幻灵战队', '人造人', '超频战士',
       '圣灵使者', '执事', '战略分析师', '斗士', '战地机甲', '赛博牢大'
     ];
 
+    let drawCount = 0;
+    const limit = 3;
+    const windowMs = 5 * 60 * 1000; // 5分钟
+    let startTime = null;
+
     function drawOptions() {
+      const now = Date.now();
+      const messageDiv = document.getElementById('message');
+
+      if (!startTime || now - startTime > windowMs) {
+        startTime = now;
+        drawCount = 0;
+      }
+
+      if (drawCount >= limit) {
+        messageDiv.textContent = '每5分钟最多只能抽取三次，请稍后再试。';
+        return;
+      }
+
+      drawCount++;
+      messageDiv.textContent = '';
+
       const shuffled = options.sort(() => 0.5 - Math.random());
       const selected = shuffled.slice(0, 3);
 
